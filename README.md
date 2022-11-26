@@ -17,22 +17,31 @@ This implementation isolates the algorithm from the tree datastructure. The tree
   List<V> Function(V) next;
 ```
 
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
 ```dart
-const like = 'sample';
+    Map<int, List<int>> simpleTree = {
+      0: [1, 2],
+      1: [3],
+      2: [4, 5],
+      3: [],
+      4: [],
+      5: []
+    };
+
+    Map<int, Offset> nodePositions = {};
+    Map<int, Size> nodeSizes = {};
+
+    var algo = PloegTreeLayout(
+        roots: () => [0],
+        next: (v) => simpleTree[v]!,
+        sizeGetter: (v) {
+          Size size =
+              Size(Random().nextInt(90) + 30, Random().nextInt(60) + 20);
+          nodeSizes[v] = size;
+          return size;
+        },
+        onPositionChange: (v, offset) => {nodePositions[v] = offset});
+    algo.layout();
 ```
 
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
