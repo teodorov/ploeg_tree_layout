@@ -1,3 +1,7 @@
+## 1.0.3
+
+* relative link in README
+
 ## 1.0.2
 
 * Added an example screenshot in the README.
