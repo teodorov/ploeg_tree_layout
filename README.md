@@ -10,6 +10,8 @@ This code is in the public domain, use it any way you wish. A reference to the p
 
 ## Features
 
+![screenshot](example/screen.png)
+
 This implementation isolates the algorithm from the tree datastructure. The tree is obtained through via
 
 ```dart

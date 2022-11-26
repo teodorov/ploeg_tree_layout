@@ -1,3 +1,8 @@
+## 1.0.2
+
+* Added an example screenshot in the README.
+* Cleaned the example a bit
+  
 ## 1.0.1
 
 * Added a PloegTreeLayout example.

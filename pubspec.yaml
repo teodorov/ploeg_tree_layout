@@ -1,6 +1,6 @@
 name: ploeg_tree_layout
 description: A dart implementation of the Ploeg Non-layerd Tidy Tree Layout.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/teodorov/ploeg_tree_layout
 
 environment:
