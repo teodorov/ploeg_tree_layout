@@ -17,37 +17,48 @@ import 'dart:ui';
 /// appreciated!
 
 class PloegTreeLayout<V> {
-  PloegTreeLayout(
-      {required this.roots,
-      required this.next,
-      required this.sizeGetter,
-      required this.onPositionChange,
-      this.levelSeparation = 20.0});
+  PloegTreeLayout({
+    required this.roots,
+    required this.next,
+    required this.sizeGetter,
+    required this.onPositionChange,
+    this.levelSeparation = 20.0,
+    this.siblingSeparation = 5.0,
+  })  : assert(siblingSeparation >= 0),
+        assert(levelSeparation >= 0);
 
+  /// A function returning the list of tree roots
   List<V> Function() roots;
+
+  /// A function returning the children of a node in a tree
   List<V> Function(V) next;
+
+  /// A function returning the size (width, height) of a node
   Size Function(V) sizeGetter;
+
+  /// The separation between the levels in the layout
   double levelSeparation;
+
+  /// The minimum distance between two siblings
+  double siblingSeparation;
+
+  /// A callback which is invoked when the position of a node is known
   Function(V, Offset) onPositionChange;
 
-  final Map<V, _LayoutData<V>> _layoutDataMap = Map.identity();
+  final Map<V?, _LayoutData<V>> _layoutDataMap = Map.identity();
 
+  ///The entry point for the layout algorithm
   layout() {
-    List<V> roots = this.roots();
-    for (var v in roots) {
-      firstWalk(v, 0);
-    }
-    for (var v in roots) {
-      secondWalk(v, 0);
-    }
+    firstWalk(null, -(levelSeparation));
+    secondWalk(null, 0);
   }
 
-  firstWalk(V node, double yPosition) {
-    Size nodeSize = sizeGetter(node);
+  firstWalk(V? node, double yPosition) {
+    Size nodeSize = node == null ? const Size(0, 0) : sizeGetter(node);
     _layoutDataMap.putIfAbsent(
         node,
         () => _LayoutData(Offset(double.infinity, yPosition),
-            Size(nodeSize.width + 5, nodeSize.height + 5)));
+            Size(nodeSize.width + siblingSeparation, nodeSize.height)));
 
     List<V> children = getChildren(node);
     if (children.isEmpty) {
@@ -73,13 +84,15 @@ class PloegTreeLayout<V> {
     setExtremes(node);
   }
 
-  secondWalk(V node, double modsum) {
+  secondWalk(V? node, double modsum) {
     List<V> children = getChildren(node);
     _LayoutData<V> nodeData = _layoutDataMap[node]!;
     modsum += nodeData.mod;
     // Set absolute (non-relative) horizontal coordinate.
     nodeData.position = Offset(nodeData.prelim + modsum, nodeData.position.dy);
-    onPositionChange(node, nodeData.position);
+    if (node != null) {
+      onPositionChange(node, nodeData.position);
+    }
     addChildSpacing(node);
     for (int i = 0; i < children.length; i++) {
       secondWalk(children[i], modsum);
@@ -87,7 +100,7 @@ class PloegTreeLayout<V> {
   }
 
   // Process change and shift to add intermediate spacing to mod.
-  void addChildSpacing(V node) {
+  void addChildSpacing(V? node) {
     List<V> children = getChildren(node);
     double d = 0, modsumdelta = 0;
     for (int i = 0; i < children.length; i++) {
@@ -114,7 +127,7 @@ class PloegTreeLayout<V> {
     return IYL(minY, i, ih);
   }
 
-  positionRoot(V node) {
+  positionRoot(V? node) {
     List<V> children = getChildren(node);
     // Position root between children, taking into account their mod.
     V leftmostChild = children[0];
@@ -130,7 +143,7 @@ class PloegTreeLayout<V> {
             width(node) / 2);
   }
 
-  setExtremes(V node) {
+  setExtremes(V? node) {
     List<V> children = getChildren(node);
     var data = _layoutDataMap[node]!;
     if (children.isEmpty) {
@@ -150,7 +163,7 @@ class PloegTreeLayout<V> {
     data.msel = mser(rightmostChild);
   }
 
-  void seperate(V node, int i, IYL? ih) {
+  void seperate(V? node, int i, IYL? ih) {
     List<V> children = getChildren(node);
     //Right contour node of left siblings and its sum of modfiers.
     V? sr = children[i - 1];
@@ -189,7 +202,7 @@ class PloegTreeLayout<V> {
     }
   }
 
-  void moveSubtree(V node, int i, int si, double dist) {
+  void moveSubtree(V? node, int i, int si, double dist) {
     List<V> children = getChildren(node);
     //Move subtree by changing mod.
     _LayoutData<V> data = _layoutDataMap[children[i]]!;
@@ -211,7 +224,7 @@ class PloegTreeLayout<V> {
   extremeRight(V node) => _layoutDataMap[node]!.extremeLeft;
   leftThread(V node) => _layoutDataMap[node]!.leftThread;
 
-  void setLeftThread(V node, int i, V cl, double modsumcl) {
+  void setLeftThread(V? node, int i, V cl, double modsumcl) {
     List<V> children = getChildren(node);
     _LayoutData<V> leftmostData = _layoutDataMap[children[0]]!;
     _LayoutData<V> ithData = _layoutDataMap[children[i]]!;
@@ -229,7 +242,7 @@ class PloegTreeLayout<V> {
     leftmostData.msel = ithData.msel;
   }
 
-  distributeExtra(V node, int i, int si, double dist) {
+  distributeExtra(V? node, int i, int si, double dist) {
     //Are there intermediate children?
     if (si == i - 1) {
       return;
@@ -245,7 +258,7 @@ class PloegTreeLayout<V> {
 
   rightThread(V node) => _layoutDataMap[node]!.rightThread;
   //Symmetrical to setLeftThread.
-  void setRightThread(V node, int i, V sr, double modsumsr) {
+  void setRightThread(V? node, int i, V sr, double modsumsr) {
     List<V> children = getChildren(node);
 
     _LayoutData<V> beforeIData = _layoutDataMap[children[i - 1]]!;
@@ -262,7 +275,7 @@ class PloegTreeLayout<V> {
   }
 
   prelim(V node) => _layoutDataMap[node]!.prelim;
-  setPrelim(V node, double value) => _layoutDataMap[node]!.prelim = value;
+  setPrelim(V? node, double value) => _layoutDataMap[node]!.prelim = value;
   mod(V node) => _layoutDataMap[node]!.mod;
   msel(V node) => _layoutDataMap[node]!.msel;
   mser(V node) => _layoutDataMap[node]!.mser;

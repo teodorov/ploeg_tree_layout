@@ -1,3 +1,9 @@
+## 1.0.4
+
+* Corrected the layout of forests (multiple disjoint trees)
+* Added a sibling separation parameter, giving the minimal x distance between siblings
+* Added some documentation on the instance variables
+
 ## 1.0.3
 
 * relative link in README

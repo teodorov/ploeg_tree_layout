@@ -30,16 +30,19 @@ class GraphScene extends StatefulWidget {
 }
 
 class _GraphSceneState extends State<GraphScene> {
-  Map<int, List<int>> randomTree = RandomTree.tree(10, 5, 0);
+  Map<int, List<int>> randomTree = RandomTree.tree(5, 2, 0);
+  Map<int, List<int>> randomTree2 = RandomTree.tree(5, 3, 11);
+
   Map<int, Offset> nodePositions = {};
   Map<int, Size> nodeSizes = {};
 
   @override
   void initState() {
     super.initState();
+    randomTree.addAll(randomTree2);
 
     var algo = PloegTreeLayout(
-        roots: () => [0],
+        roots: () => [0, 11],
         next: (v) => randomTree[v]!,
         sizeGetter: (v) {
           Size size =
@@ -47,7 +50,9 @@ class _GraphSceneState extends State<GraphScene> {
           nodeSizes[v] = size;
           return size;
         },
-        onPositionChange: (v, offset) => {nodePositions[v] = offset});
+        onPositionChange: (v, offset) {
+          nodePositions[v] = offset;
+        });
     algo.layout();
   }
 

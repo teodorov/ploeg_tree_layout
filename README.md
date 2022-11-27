@@ -10,7 +10,11 @@ This code is in the public domain, use it any way you wish. A reference to the p
 
 ## Features
 
+Non-layered tidy tree layout of a tree
 ![screenshot](./example/screen.png)
+
+Non-layered tidy tree layout of a forest
+![screenshot](./example/screen_forest.png)
 
 This implementation isolates the algorithm from the tree datastructure. The tree is obtained through via
 
