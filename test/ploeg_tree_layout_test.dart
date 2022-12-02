@@ -30,8 +30,8 @@ void main() {
           return size;
         },
         onPositionChange: (v, offset) => {nodePositions[v] = offset});
-    algo.layout();
-
+    var size = algo.layout();
+    expect(size > Size.zero, true);
     expect(nodeSizes.length, 6);
   });
 }

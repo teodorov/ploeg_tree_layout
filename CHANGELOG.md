@@ -1,3 +1,7 @@
+## 1.0.5
+
+* The layout returns the bounding box size needed to contain all nodes.
+
 ## 1.0.4
 
 * Corrected the layout of forests (multiple disjoint trees)

@@ -105,9 +105,9 @@ packages:
   ploeg_tree_layout:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: ploeg_tree_layout
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "1.0.4"
   sky_engine:
     dependency: transitive
