@@ -49,7 +49,7 @@ class PloegTreeLayout<V> {
   final Map<V?, _LayoutData<V>> _layoutDataMap = Map.identity();
 
   ///The entry point for the layout algorithm
-  Size layout() {
+  Rect layout() {
     firstWalk(null, -(levelSeparation));
     return secondWalk(null, 0);
   }
@@ -85,7 +85,7 @@ class PloegTreeLayout<V> {
     setExtremes(node);
   }
 
-  Size secondWalk(V? node, double modsum, [Size boxSize = Size.zero]) {
+  Rect secondWalk(V? node, double modsum, [Rect box = Rect.zero]) {
     List<V> children = getChildren(node);
     _LayoutData<V> nodeData = _layoutDataMap[node]!;
     modsum += nodeData.mod;
@@ -93,15 +93,14 @@ class PloegTreeLayout<V> {
     nodeData.position = Offset(nodeData.prelim + modsum, nodeData.position.dy);
     if (node != null) {
       onPositionChange(node, nodeData.position);
-      boxSize = boxSize.union(Size(nodeData.position.dx + nodeData.size.width,
-          nodeData.position.dy + nodeData.size.height));
+      box = box.expandToInclude(nodeData.position & nodeData.size);
     }
     addChildSpacing(node);
     for (int i = 0; i < children.length; i++) {
-      var childBox = secondWalk(children[i], modsum, boxSize);
-      boxSize = boxSize.union(childBox);
+      var childBox = secondWalk(children[i], modsum, box);
+      box = box.expandToInclude(childBox);
     }
-    return boxSize;
+    return box;
   }
 
   // Process change and shift to add intermediate spacing to mod.
@@ -335,10 +334,4 @@ class IYL {
   double lowY;
   int index;
   IYL? nxt;
-}
-
-extension Union on Size {
-  union(Size other) {
-    return Size(max(width, other.width), max(height, other.height));
-  }
 }

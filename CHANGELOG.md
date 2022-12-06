@@ -1,3 +1,7 @@
+## 1.1.0
+
+* The layout return the bounding box containing all nodes
+
 ## 1.0.5
 
 * The layout returns the bounding box size needed to contain all nodes.
